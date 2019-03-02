@@ -12,7 +12,7 @@ class Game{
 	private int [][] game_board = new int[10][10];
 	private final String illegal = "Illegal move";
 	
-	private Scanner input = new Scanner(System.in);
+	
 	
 	public Game(){
 		setupGame();
@@ -191,6 +191,7 @@ class Game{
 		changeSquare(5, 5, 2);
 	}
 	public void simGame(){
+		private Scanner input = new Scanner(System.in);
 		int in;
 		int x;
 		int y;

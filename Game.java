@@ -1,6 +1,9 @@
+
+
 import java.awt.dnd.*;
 import javax.naming.directory.*;
 import java.awt.*;
+import java.util.Scanner;
 
 class Game{
 	//
@@ -8,6 +11,9 @@ class Game{
 	//COORDINATES ENTERED GO Y ACCROSS AND X DOWN (THE OPPOSITE OF A REGULAR X/Y PLANE)
 	private int [][] game_board = new int[10][10];
 	private final String illegal = "Illegal move";
+	
+	private Scanner input = new Scanner(System.in);
+	
 	public Game(){
 		setupGame();
 	}
@@ -36,37 +42,16 @@ class Game{
 		*/
 	public void makeMove(int x, int y , int value){
 		boolean legal;
-		String ad  = checkAdSquares(x, y);
-		if(checkInput(value)){
-			if(game_board[x][y] == 0){
-				if(ad.equalsIgnoreCase("00000000") || ad.equalsIgnoreCase("CC000CCC") || ad.equalsIgnoreCase("0CCCCC00") || ad.equalsIgnoreCase("000CCCCC") || ad.equalsIgnoreCase("CCCC000C")){
-					System.out.println(illegal);
-				}else{ 
-					if(value == 1){
-						if(ad.equalsIgnoreCase("11111111") || ad.equalsIgnoreCase("CC111CCC") || ad.equalsIgnoreCase("1CCCCC11") || ad.equalsIgnoreCase("111CCCCC") || ad.equalsIgnoreCase("CCCC111C")){
-							System.out.println(illegal);
-						}
-					}else if(value == 2){
-						if(ad.equalsIgnoreCase("22222222") || ad.equalsIgnoreCase("CC222CCC") || ad.equalsIgnoreCase("2CCCCC22") || ad.equalsIgnoreCase("222CCCCC") || ad.equalsIgnoreCase("CCCC222C")){
-							System.out.println(illegal);
-							}
-					}else if(returnValue(x, y) != 0){
-						System.out.println(illegal);
-					}
-					/**
-					changeSquare(x, y, value);
-					for(int i = 1; i < 9; i ++){
-						legalMove = checkLegalMove(x,y,value,i);
-						if(legalMove){
-							flipChips(x, y, value, i);	
-						}
-					}
-					*/
-					legal = legalMove(x, y, value, true);
-					System.out.println(legal);
-				}
-			}
+		int posX = y;
+		int posY = x;
+		legal = legalMove(posX, posY, value, false);
+		if(legal){
+			legalMove(posX, posY, value, true);
+			changeSquare(posX, posY, value);
+			System.out.println("X: " + posX + " Y: " + posY);
 		}
+		//Comment out to no prinr gamestate every tunr
+		printGameState();
 	}
 	public boolean legalMove(int x, int y, int color, boolean flip){
 		boolean legal = false;
@@ -99,7 +84,6 @@ class Game{
 								pX -=i;
 								pY -=j;
 								current = game_board[pY][pX];
-								
 								while(current != 0){
 									game_board[pY][pX] = color;
 									pX -= i;
@@ -173,7 +157,7 @@ class Game{
 	}
 	private String printRow(int x){
 		String row = "";
-		for(int i = 0; i < 8; i++){
+		for(int i = 1; i < 9; i++){
 			switch(returnValue(x,i)){
 				case 0: row += "E";
 						break;
@@ -189,27 +173,47 @@ class Game{
 		return row;
 	}
 	public void printGameState(){
-		System.out.println("    1 2 3 4 5 6 7 8");
-		for(int i = 0; i < 9; i++){
-			System.out.println((i+1) + " [ "+ printRow(i) + "]");	
+		System.out.println("Y X 1 2 3 4 5 6 7 8");
+		for(int i = 1; i < 9; i++){
+			System.out.println((i) + " [ "+ printRow(i) + "]");	
 		}
 	}
 	private void setupGame(){
-		changeSquare(3, 4, 1);
-		changeSquare(4, 3, 1);
-		changeSquare(3, 3, 2);
+		for(int i = 0; i < 10;i++){
+			changeSquare(0, i, -1);
+			changeSquare(i, 0, -1);
+			changeSquare(9, i, -1);
+			changeSquare(i, 9, -1);
+		}
+		changeSquare(4, 5, 1);
+		changeSquare(5, 4, 1);
 		changeSquare(4, 4, 2);
-	}			
-	public static void main(String[] args){
-			Game test_game = new Game();
-			boolean done = true;
-			for(int i = 1; i < 9; i++){
-				for(int j = 1; j < 9; j++){
-					if((test_game.legalMove(i,j,1,false)) || (test_game.legalMove(i,j,2,false))){
-						done = false;
-					}
-				}
+		changeSquare(5, 5, 2);
+	}
+	public void simGame(){
+		int in;
+		int x;
+		int y;
+		boolean turn = true;
+		while(true){
+			if(turn){
+				System.out.println("Enter play for black team");
+				x = input.nextInt();
+				y = input.nextInt();
+				makeMove(x,y , 1);
+				turn = false;
+			}else{
+				System.out.println("Enter play for white team");
+				x = input.nextInt();
+				y = input.nextInt();
+				makeMove(x,y, 2);
+				turn = true;
 			}
-			test_game.printGameState();
-		}		
+		}
+	}
+		public static void main(String [] args){
+			Game sim_game = new Game();
+			sim_game.printGameState();
+			sim_game.simGame();
+		}
 }

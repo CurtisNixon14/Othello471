@@ -34,20 +34,44 @@ public class Player {
 
     // Places a disc onto the board and flips any captured discs.
     private Board updateBoard(Board currentState, int[] thisMove){
+        // Does Java copy arrays by value or by reference?
 
         // Need more information to determine which opponent discs to flip.
         int[] prev = previousMoves.get(thisMove[2]);
-
+        int start;
+        int limit;
+        // Horizontal
         if (thisMove[0] == prev[0]){
-            
+            if (thisMove[1] < prev[1]){ start = thisMove[1]; limit = prev[1]; }
+            else{ start = prev[1]; limit = thisMove[1]; }
+            for (int i = start; i < limit; i++){
+                currentState.board[thisMove[0]][i] = turn;
+            }
         }
+
+        // Vertical
         else if (thisMove[1] == prev[1]) {
-
+            if (thisMove[0] < prev[0]) { start = thisMove[0]; limit = prev[0]; }
+            else { start = prev[0]; limit = thisMove[0]; }
+            for (int i = start; i < limit; i++){
+                currentState.board[i][thisMove[1]] = turn;
+            }
         }
+
+        // Diagonal
         else if (prev[1] - thisMove[1] == prev[0] - thisMove[0]) {
-
+            int start2;
+            int limit2;
+            if (thisMove[0] < prev[0]){ start = thisMove[0]; limit = prev[0]; }
+            else{ start = prev[0]; limit = thisMove[0]; }
+            if (thisMove[1] < prev[1]){ start2 = thisMove[1]; limit2 = prev[1]; }
+            else { start2 = prev[1]; limit2 = thisMove[1]; }
+            for (int r = start; r < limit; r++){
+                for (int c = start2; c < limit2; c++){
+                    currentState.board[r][c] = turn;
+                }
+            }
         }
-
 
         return currentState;
     }

@@ -1,6 +1,14 @@
+package Othello471;
+
+import java.lang.String;
+
 public class Board {
 
     int[][] board;
+
+    public Board(){
+        board = new int[8][8];
+    }
 
     public Board(int player1, int player2){
         board = new int[8][8];
@@ -21,6 +29,20 @@ public class Board {
             }
         }
         return count;
+    }
+
+    public void printBoard(){
+        for (int r = 0; r < board.length; r++){
+            StringBuilder row = new StringBuilder();
+            for (int c = 0; c < board[0].length; c++){
+                switch(board[r][c]){
+                    case 0: row.append('_'); break;
+                    case 1: row.append('B'); break;
+                    case 2: row.append('W'); break;
+                }
+            }
+            System.out.println(row.toString());
+        }
     }
 
     // Determining whether this move is contiguous with other pieces and captures at least one enemy piece.
@@ -89,6 +111,7 @@ public class Board {
             }
         }
 
+        // If this move captures opponent discs and is contiguous with other discs, return true.
         if (capture_count > 0){
             return true;
         }

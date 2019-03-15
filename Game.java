@@ -201,12 +201,15 @@ class Game{
 		int x;
 		int y;
 		Point p;
-		List<Point> legalMoves;
+		List<Point> legalMovesBlack;
+		List<Point> legalMovesWhite;
 		String invalid = "Invalid Move, please try again";
 		boolean movesLeft = true;
 		while(movesLeft){
-			legalMoves = getMoves(1);
-			if(turn && !legalMoves.isEmpty()){
+			legalMovesBlack = getMoves(1);
+			legalMovesWhite = getMoves(2);
+			if(turn && !legalMovesBlack.isEmpty()){
+				System.out.println(legalMovesBlack);
 				System.out.println("Black Move");
 				p = getInputFromUser();
 				x = p.getX();
@@ -215,9 +218,10 @@ class Game{
 					makeMove(x,y , 1);
 					turn = false;
 				}else{
-					System.out.print(invalid);
+					System.out.print(invalid+"\n");
 				}
-			}else if(turn && !legalMoves.isEmpty()){
+			}else if(!turn && !legalMovesWhite.isEmpty()){
+				System.out.print(legalMovesWhite);
 				System.out.println("White Move");
 				p = getInputFromUser();
 				x = p.getX();
@@ -226,11 +230,33 @@ class Game{
 					makeMove(x,y, 2);
 					turn = true;
 				}else{
-					System.out.println(invalid);
+					System.out.println(invalid+"\n");
 				}
 			}else{
 				System.out.println("No more legal moves");
 			}
+			printGameState();
+		}
+		endGame();
+	}
+	private void endGame(){
+		int black = 0;
+		int white = 0;
+		for(int i = 1; i <9; i ++){
+			for(int j = 1; j <9; j++){
+				if(game_board[i][j] == 1){
+					black++;
+				}else{
+					white++;
+				}
+			}
+		}
+		if(black > white){
+			System.out.print("Game over: Black wins");
+		}else if(white > black){
+			System.out.print("Game over: White wins");
+		}else{
+			System.out.print("No winner: DeadLock");
 		}
 	}
 	public Point getInputFromUser(){
@@ -270,7 +296,7 @@ class Game{
 		for(int i = 1; i<9;i++){
 			for(int j = 1; j<9;j++){
 				if(legalMove(i, j, color, false)){
-					p = new Point(i, j);
+					p = new Point(j,i);
 					list.add(p);
 				}
 			}

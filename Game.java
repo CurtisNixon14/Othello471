@@ -4,11 +4,13 @@ import java.awt.dnd.*;
 import javax.naming.directory.*;
 import java.awt.*;
 import java.util.Scanner;
+import java.util.List;
+import java.util.*;
 
 class Game{
 	//
 	//Game setup 1= black 2 = white 0 = unused square
-	//COORDINATES ENTERED GO Y ACCROSS AND X DOWN (THE OPPOSITE OF A REGULAR X/Y PLANE)
+	//I used 10X10 because its easier to check border moves with room in the array on each side
 	private int [][] game_board = new int[10][10];
 	private final String illegal = "Illegal move";
 	
@@ -23,6 +25,7 @@ class Game{
 	public int returnValue(int x, int y){
 		return game_board[x][y];
 	}
+	//makes sure the input to go into the array is either 1 or 2
 	private boolean checkInput(int value){
 		if( value > 0 && value < 3){
 			return true;
@@ -30,7 +33,11 @@ class Game{
 			return false;
 		}
 	}
-	private void changeSquare(int x, int y ,int value){
+	//return values: -1 border, 0 empty, 1 black, 2 white
+	public int[][] getGameState(){
+		return game_board;
+	}
+	public void changeSquare(int x, int y ,int value){
 		game_board[x][y] = value;
 	}
 	/**
@@ -50,9 +57,8 @@ class Game{
 			changeSquare(posX, posY, value);
 			System.out.println("X: " + posX + " Y: " + posY);
 		}
-		//Comment out to no prinr gamestate every tunr
-		printGameState();
 	}
+	//Returns true if the proposed move is legal 
 	public boolean legalMove(int x, int y, int color, boolean flip){
 		boolean legal = false;
 		
@@ -191,30 +197,122 @@ class Game{
 		changeSquare(5, 5, 2);
 	}
 	public void simGame(){
-		private Scanner input = new Scanner(System.in);
-		int in;
+		boolean turn = true;
 		int x;
 		int y;
-		boolean turn = true;
-		while(true){
-			if(turn){
-				System.out.println("Enter play for black team");
-				x = input.nextInt();
-				y = input.nextInt();
-				makeMove(x,y , 1);
-				turn = false;
+		Point p;
+		List<Point> legalMoves;
+		String invalid = "Invalid Move, please try again";
+		boolean movesLeft = true;
+		while(movesLeft){
+			legalMoves = getMoves(1);
+			if(turn && !legalMoves.isEmpty()){
+				System.out.println("Black Move");
+				p = getInputFromUser();
+				x = p.getX();
+				y = p.getY();
+				if(legalMove(x, y, 1, false)){
+					makeMove(x,y , 1);
+					turn = false;
+				}else{
+					System.out.print(invalid);
+				}
+			}else if(turn && !legalMoves.isEmpty()){
+				System.out.println("White Move");
+				p = getInputFromUser();
+				x = p.getX();
+				y = p.getY();
+				if(legalMove(x, y, 2, false)){
+					makeMove(x,y, 2);
+					turn = true;
+				}else{
+					System.out.println(invalid);
+				}
 			}else{
-				System.out.println("Enter play for white team");
-				x = input.nextInt();
-				y = input.nextInt();
-				makeMove(x,y, 2);
-				turn = true;
+				System.out.println("No more legal moves");
 			}
 		}
 	}
+	public Point getInputFromUser(){
+		Scanner input = new Scanner(System.in);
+		int x = 0;
+		int y =0;
+		boolean validInput = false;
+		String invalid = "The entered number is invalid, please try again?";
+		System.out.println("Please enter the x coordinate of your next move");
+		while(!validInput){
+			try {
+				x = input.nextInt();
+			} catch (Exception e) {
+				System.out.println(invalid);
+			}
+			if(x < 9 && x > 1){
+				validInput = true;
+			}
+		}
+		validInput = false;
+		System.out.println("Please enter the y coordinate of your next move");
+		while(!validInput){
+			try {
+				y = input.nextInt();
+			} catch (Exception e) {
+				System.out.println(invalid);
+			}
+			if(y < 9 && y > 1){
+				validInput = true;
+			}
+		}
+		return new Point(x,y);
+	}
+	public List<Point> getMoves(int color){
+		List<Point> list = new ArrayList<Point>();
+		Point p;
+		for(int i = 1; i<9;i++){
+			for(int j = 1; j<9;j++){
+				if(legalMove(i, j, color, false)){
+					p = new Point(i, j);
+					list.add(p);
+				}
+			}
+		}
+		return list;
+	}
+
 		public static void main(String [] args){
 			Game sim_game = new Game();
 			sim_game.printGameState();
 			sim_game.simGame();
-		}
+			/**
+			List <Point> list = sim_game.getMoves(1);
+			Point p;
+			while(!list.isEmpty()){
+				p = list.remove(list.size()-1);
+				System.out.println(p);
+			}
+			*/
+	
+	}
+}
+class Point{
+	private final int x;
+	private final int y;
+	
+	public Point(){
+		this.x = 0;
+		this.y = 0;
+	}
+	public Point(int x, int y){
+		this.x = x;
+		this.y = y;
+	}
+	public int getX(){
+		return this.x;
+	}
+	public int getY(){
+		return this.y;
+	}
+	@Override
+	public String toString(){
+		return ("("+x+","+y+")");
+	}
 }

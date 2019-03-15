@@ -1,21 +1,57 @@
 package Othello471;
 
-import java.lang.String;
-
 public class Board {
 
-    int[][] board;
+    private int[][] board;
+    private boolean visited;
 
     public Board(){
+        visited = false;
         board = new int[8][8];
     }
 
     public Board(int player1, int player2){
+        visited = false;
         board = new int[8][8];
         board[3][4] = player1;
         board[4][3] = player1;
         board[3][3] = player2;
         board[4][4] = player2;
+    }
+
+    // For deepCopy() method only.
+    public Board(int[][] board, boolean visited){
+        this.visited = visited;
+        this.board = new int[8][8];
+        for (int r = 0; r < board.length; r++){
+            for (int c = 0; c < board[0].length; c++){
+                this.board[r][c] = board[r][c];
+            }
+        }
+    }
+
+    public int[] dimen(){
+        return new int[] {board.length, board[0].length};
+    }
+
+    public boolean already_visited(){
+        return visited;
+    }
+
+    public void mark_visited(){
+        visited = true;
+    }
+
+    public int at(int row, int column){
+        return board[row][column];
+    }
+
+    public void mark(int player, int row, int column){
+        board[row][column] = player;
+    }
+
+    public Board deepCopy(){
+        return new Board(board, false);
     }
 
     // Determines how many of a player's discs are on the board.
@@ -44,80 +80,4 @@ public class Board {
             System.out.println(row.toString());
         }
     }
-
-    // Determining whether this move is contiguous with other pieces and captures at least one enemy piece.
-    public boolean capturesDisc(int player, int orientation, int row, int column, int[] on_same_line){
-        int i;
-        int capture_count = 0;
-
-        // Horizontal
-        if (orientation == 1){
-            if (column < on_same_line[1]){
-                for (i = column; i < on_same_line[1]; i++){
-                    if (board[row][i] == 0) {return false;}
-                    else if (board[row][i] != player) {capture_count++;}
-                }
-            }
-            else{
-                for (i = on_same_line[1]; i < column; i++){
-                    if (board[row][i] == 0) {return false;}
-                    else if (board[row][i] != player) {capture_count++;}
-                }
-            }
-        }
-
-        // Vertical
-        else if (orientation == 2){
-            if (row < on_same_line[0]){
-                for (i = row; i < on_same_line[0]; i++){
-                    if (board[i][column] == 0) {return false;}
-                    else if (board[i][column] != player) {capture_count++;}
-                }
-            }
-            else{
-                for (i = on_same_line[0]; i < row; i++){
-                    if (board[i][column] == 0) {return false;}
-                    else if (board[i][column] != player) {capture_count++;}
-                }
-            }
-        }
-
-        // Diagonal
-        else if (orientation == 3){
-            int limit;
-            if (row < on_same_line[0]){
-                i = row;
-                limit = on_same_line[0];
-            }
-            else{
-                i = on_same_line[0];
-                limit = row;
-            }
-            if (column < on_same_line[1]){
-                for (int r = i; r < limit; r++){
-                    for (int c = column; c < on_same_line[1]; c++){
-                        if (board[r][c] == 0) {return false;}
-                        else if (board[r][c] != player) {capture_count++;}
-                    }
-                }
-            }
-            else {
-                for (int r = i; r < limit; r++){
-                    for (int c = on_same_line[1]; c < column; c++){
-                        if (board[r][c] == 0) {return false;}
-                        else if (board[r][c] != player) {capture_count++;}
-                    }
-                }
-            }
-        }
-
-        // If this move captures opponent discs and is contiguous with other discs, return true.
-        if (capture_count > 0){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
 }

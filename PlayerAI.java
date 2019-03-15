@@ -1,6 +1,7 @@
 package Othello471;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class PlayerAI {
 
@@ -36,9 +37,7 @@ public class PlayerAI {
 
     // Places a disc onto the board and flips any captured discs.
     private Board updateBoard(Board prevState, int[] thisMove){
-        // Does Java copy arrays by value or by reference?
-        Board currentState = new Board();
-        System.arraycopy( prevState.board, 0, currentState.board, 0, prevState.board.length );
+        Board currentState = prevState.deepCopy();
 
         // Need to know where the "anchoring" disc is to know which opponent discs to flip.
         int[] prev = previousMoves.get(thisMove[2]);
@@ -49,7 +48,7 @@ public class PlayerAI {
             if (thisMove[1] < prev[1]){ start = thisMove[1]; limit = prev[1]; }
             else{ start = prev[1]; limit = thisMove[1]; }
             for (int i = start; i < limit; i++){
-                currentState.board[thisMove[0]][i] = turn;
+                currentState.mark(turn,thisMove[0],i);
             }
         }
 
@@ -58,7 +57,7 @@ public class PlayerAI {
             if (thisMove[0] < prev[0]) { start = thisMove[0]; limit = prev[0]; }
             else { start = prev[0]; limit = thisMove[0]; }
             for (int i = start; i < limit; i++){
-                currentState.board[i][thisMove[1]] = turn;
+                currentState.mark(turn,i,thisMove[1]);
             }
         }
 
@@ -72,7 +71,7 @@ public class PlayerAI {
             else { start2 = prev[1]; limit2 = thisMove[1]; }
             for (int r = start; r < limit; r++){
                 for (int c = start2; c < limit2; c++){
-                    currentState.board[r][c] = turn;
+                    currentState.mark(turn,r,c);
                 }
             }
         }
@@ -86,9 +85,9 @@ public class PlayerAI {
         int on_same_line;
 
         // Loop through every single empty square on the board and record any legal moves.
-        for (int row = 0; row < board.board.length; row++) {
-            for (int col = 0; col < board.board[0].length; col++) {
-                if (board.board[row][col] == 0) {
+        for (int row = 0; row < board.dimen()[0]; row++) {
+            for (int col = 0; col < board.dimen()[1]; col++) {
+                if (board.at(row,col) == 0) {
                     on_same_line = confirmLegalMove(board, row, col);
                     if (on_same_line >= 0){ list_legalmoves.add(new int[]{row, col, on_same_line}); }
                 }
@@ -102,27 +101,48 @@ public class PlayerAI {
         int[] on_same_line = new int[] {0, 0};
         int orientation = 0; // 1 is horizontal, 2 is vertical, 3 is diagonal
         // Checking that this move is on a horizontal/vertical/diagonal line with another disc of the same color.
+        int start, limit;
         int i;
         int capture_count = 0;
         for (i = 0; i < previousMoves.size(); i++) {
             if (row == previousMoves.get(i)[0]){
                 on_same_line = previousMoves.get(i);
-                orientation = 1;
+                if (column < on_same_line[1]){ start = column; limit = on_same_line[1]; }
+                else{ start = on_same_line[1]; limit = column; }
+                for (int c = start; c < limit; c++){
+                    if (board.at(row, c) == 0) {capture_count = 0; break;}
+                    else if (board.at(row, c) != turn) {capture_count++;}
+                }
                 break;
             }
             else if (column == previousMoves.get(i)[1]) {
                 on_same_line = previousMoves.get(i);
-                orientation = 2;
+                if (row < on_same_line[0]){ start = row; limit = on_same_line[0]; }
+                else{ start = on_same_line[0]; limit = row; }
+                for (int r = start; r < limit; r++){
+                    if (board.at(r, column) == 0) {capture_count = 0; break;}
+                    else if (board.at(row, column) != turn) {capture_count++;}
+                }
                 break;
             }
             else if (previousMoves.get(i)[1] - column == previousMoves.get(i)[0] - row) {
                 on_same_line = previousMoves.get(i);
-                orientation = 3;
+                int start2, limit2;
+                if (row < on_same_line[0]){ start = row; limit = on_same_line[0]; }
+                else{ start = on_same_line[0]; limit = row; }
+                if (column < on_same_line[1]){ start2 = column; limit2 = on_same_line[1]; }
+                else { start2 = on_same_line[1]; limit2 = column; }
+                for (int r = start; r < limit; r++){
+                    for (int c = start2; c < limit2; c++){
+                        if (board.at(r,c) == 0) {capture_count = 0; break;}
+                        else if (board.at(r,c) != turn) {capture_count++;}
+                    }
+                }
                 break;
             }
         }
         // Checking that this move captures at least one opponent disc and is contiguous with the other discs.
-        if (board.capturesDisc(turn, orientation, row, column, on_same_line)) {
+        if (capture_count > 0) {
             return i;
         }
         else{
@@ -130,10 +150,18 @@ public class PlayerAI {
         }
     }
 
-    private int[] getBestMove(Board board, ArrayList<int[]> legalmoves){
-        
-
+    private int[] getBestMove(Board current_board, ArrayList<int[]> legalmoves){
         int[] bestMove = legalmoves.get(0);
+
+        Stack<Board> dfs_tree = new Stack<>();
+        current_board.mark_visited();
+        dfs_tree.push(current_board);
+
+        for (int[] move : legalmoves){
+            
+        }
+
+
 
 
 

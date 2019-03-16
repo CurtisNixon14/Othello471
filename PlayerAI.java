@@ -37,7 +37,7 @@ public class PlayerAI {
 
     // Places a disc onto the board and flips any captured discs.
     private Board updateBoard(Board prevState, int[] thisMove){
-        Board currentState = prevState.deepCopy();
+        Board currentState = new Board(prevState);
 
         // Need to know where the "anchoring" disc is to know which opponent discs to flip.
         int[] prev = previousMoves.get(thisMove[2]);
@@ -81,7 +81,7 @@ public class PlayerAI {
 
     // Get a list of all legal moves.
     private ArrayList<int[]> getLegalMoves(Board board){
-        ArrayList<int[]> list_legalmoves = new ArrayList<int[]>();
+        ArrayList<int[]> list_legalmoves = new ArrayList<>();
         int on_same_line;
 
         // Loop through every single empty square on the board and record any legal moves.
@@ -89,7 +89,9 @@ public class PlayerAI {
             for (int col = 0; col < board.dimen()[1]; col++) {
                 if (board.at(row,col) == 0) {
                     on_same_line = confirmLegalMove(board, row, col);
-                    if (on_same_line >= 0){ list_legalmoves.add(new int[]{row, col, on_same_line}); }
+                    if (on_same_line >= 0){
+                        list_legalmoves.add(new int[]{row, col, on_same_line});
+                    }
                 }
             }
         }
@@ -105,6 +107,7 @@ public class PlayerAI {
         int i;
         int capture_count = 0;
         for (i = 0; i < previousMoves.size(); i++) {
+            //Horizontal
             if (row == previousMoves.get(i)[0]){
                 on_same_line = previousMoves.get(i);
                 if (column < on_same_line[1]){ start = column; limit = on_same_line[1]; }
@@ -115,6 +118,7 @@ public class PlayerAI {
                 }
                 break;
             }
+            //Vertical
             else if (column == previousMoves.get(i)[1]) {
                 on_same_line = previousMoves.get(i);
                 if (row < on_same_line[0]){ start = row; limit = on_same_line[0]; }
@@ -125,6 +129,7 @@ public class PlayerAI {
                 }
                 break;
             }
+            //Diagonal
             else if (previousMoves.get(i)[1] - column == previousMoves.get(i)[0] - row) {
                 on_same_line = previousMoves.get(i);
                 int start2, limit2;
@@ -152,13 +157,44 @@ public class PlayerAI {
 
     private int[] getBestMove(Board current_board, ArrayList<int[]> legalmoves){
         int[] bestMove = legalmoves.get(0);
+        int best_max = -1;  // One below the lowest possible value for MAX.
+        int best_min = (current_board.dimen()[0] * current_board.dimen()[1]) + 1;  // One above the highest possible value for MAX.
+        int MAX = 1;  // Score will be determined by number of black discs on the board.
 
-        Stack<Board> dfs_tree = new Stack<>();
-        current_board.mark_visited();
-        dfs_tree.push(current_board);
+        // Checking MIN level nodes.
+        for (int[] move1 : legalmoves){
+            Board new_board = updateBoard(current_board, move1);
 
-        for (int[] move : legalmoves){
-            
+            ArrayList<int[]> legalmoves2 = getLegalMoves(new_board);
+
+            // Checking MAX level nodes.
+            for (int[] move2 : legalmoves2){
+                Board new_board2 = updateBoard(new_board, move2);
+
+                ArrayList<int[]> legalmoves3 = getLegalMoves(new_board2);
+
+                // Checking MIN level nodes.
+                for (int[] move3 : legalmoves3){
+                    Board new_board3 = updateBoard(new_board2, move3);
+                    new_board3.score(MAX);
+                    if (new_board3.getScore() > best_max){
+                        best_max = new_board3.getScore();
+                        bestMove = move1;
+                    }
+
+                }
+
+                new_board2.score(MAX);
+                if (new_board2.getScore() < best_min){
+                    best_min = new_board2.getScore();
+                    bestMove = move1;
+                }
+            }
+            new_board.score(MAX);
+            if (new_board.getScore() > best_max){
+                best_max = new_board.getScore();
+                bestMove = move1;
+            }
         }
 
 

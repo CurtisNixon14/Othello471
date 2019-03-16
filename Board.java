@@ -3,15 +3,15 @@ package Othello471;
 public class Board {
 
     private int[][] board;
-    private boolean visited;
+    private int score;
 
     public Board(){
-        visited = false;
+        score = 0;
         board = new int[8][8];
     }
 
     public Board(int player1, int player2){
-        visited = false;
+        score = 0;
         board = new int[8][8];
         board[3][4] = player1;
         board[4][3] = player1;
@@ -20,12 +20,12 @@ public class Board {
     }
 
     // For deepCopy() method only.
-    public Board(int[][] board, boolean visited){
-        this.visited = visited;
-        this.board = new int[8][8];
+    public Board(Board source){
+        score = 0;
+        board = new int[8][8];
         for (int r = 0; r < board.length; r++){
             for (int c = 0; c < board[0].length; c++){
-                this.board[r][c] = board[r][c];
+                board[r][c] = source.at(r, c);
             }
         }
     }
@@ -34,12 +34,8 @@ public class Board {
         return new int[] {board.length, board[0].length};
     }
 
-    public boolean already_visited(){
-        return visited;
-    }
-
-    public void mark_visited(){
-        visited = true;
+    public int getScore(){
+        return score;
     }
 
     public int at(int row, int column){
@@ -50,21 +46,16 @@ public class Board {
         board[row][column] = player;
     }
 
-    public Board deepCopy(){
-        return new Board(board, false);
-    }
-
     // Determines how many of a player's discs are on the board.
-    public int findTotalDiscs(int player){
-        int count = 0;
+    public int score(int player){
         for (int i = 0; i < board.length; i++){
             for (int j = 0; j < board[0].length; j++){
                 if (board[i][j] == player) {
-                    count+=1;
+                    score+=1;
                 }
             }
         }
-        return count;
+        return score;
     }
 
     public void printBoard(){

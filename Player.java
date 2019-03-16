@@ -11,9 +11,9 @@ public class Player {
     private int turn; // Black goes first.
     private int opponent;
 
-    public Player(int turn){
+    public Player(int turn, int opp){
         this.turn = turn;
-        opponent = 0;
+        opponent = opp;
     }
 
     public Board makeMove(Board currentState) throws Exception {
@@ -37,8 +37,8 @@ public class Player {
             move = new int[] {Character.getNumericValue(move_string.charAt(0)),
                     Character.getNumericValue(move_string.charAt(1)), 0};
             for (String m : legalMoves){
-                if (Character.getNumericValue(m.charAt(0)) == move[0]
-                        && Character.getNumericValue(m.charAt(0)) == move[1]){
+                if (Character.getNumericValue(m.charAt(m.length()-2)) == move[0]
+                        && Character.getNumericValue(m.charAt(m.length()-1)) == move[1]){
                     return updateBoard(currentState, m);
                 }
             }
@@ -78,33 +78,24 @@ public class Player {
         ArrayList<int[]> all_your_discs = board.findPositions(turn);
         StringBuilder move;
 
-        // Finding the opponent's disc symbol.
-        if (opponent == 0){
-            for (int r = 0; r < board.dimen()[0]; r++){
-                for (int c = 0; c < board.dimen()[1]; r++){
-                    if (board.at(r,c) != turn && board.at(r,c) != 0){
-                        opponent = board.at(r,c);
-                        break;
-                    }
-                }
-            }
-        }
-
         // Using each of the player's current discs' positions, find all possible moves.
         for (int[] possible : all_your_discs){
             int row = possible[0];
             int column = possible[1];
+
             // Checking all adjacent positions for an opponent disc.
             for (int[] adj : adjacent){
                 move = new StringBuilder(); //Initializing the move-string.
                 int mod_row = row + adj[0];
                 int mod_col = column + adj[1];
-                //
+
+                // If there is an adjacent opponent disc, add its position to the move-string.
                 if (board.inbounds(mod_row, mod_col)
                         && board.at(mod_row, mod_col) == opponent){
                     move.append(mod_row);
                     move.append(mod_col);
 
+                    // Continue in the direction of the adjacent opponent disc.
                     while (board.inbounds(mod_row+adj[0], mod_col+adj[1])){
                         mod_row += adj[0];
                         mod_col += adj[1];
@@ -117,13 +108,22 @@ public class Player {
                         else if (board.at(mod_row, mod_col) == 0){
                             move.append(mod_row);
                             move.append(mod_col);
-                            list_legalmoves.add(move.toString());
+                            // Ignore copies of move-strings that are already in list_legalmoves.
+                            if (!list_legalmoves.contains(move.toString())){
+                                list_legalmoves.add(move.toString());
+                            }
+                            break;
+                        }
+                        else{
                             break;
                         }
                     }
                 }
             }
         }
+
+        
+
         return list_legalmoves;
     }
 

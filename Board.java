@@ -1,4 +1,5 @@
 package Othello471;
+import java.util.ArrayList;
 
 public class Board {
 
@@ -46,6 +47,8 @@ public class Board {
         board[row][column] = player;
     }
 
+    public boolean inbounds(int row, int column){ return (row > -1 && row < 8 && column > -1 && column < 8); }
+
     // Determines how many of a player's discs are on the board.
     public int score(int player){
         for (int i = 0; i < board.length; i++){
@@ -58,20 +61,32 @@ public class Board {
         return score;
     }
 
+    public ArrayList<int[]> findPositions(int player){
+        ArrayList<int[]> positions = new ArrayList<>();
+        for (int i = 0; i < board.length; i++){
+            for (int j = 0; j < board[0].length; j++){
+                if (board[i][j] == player) {
+                    positions.add(new int[] {i, j});
+                }
+            }
+        }
+        return positions;
+    }
+
     public void printBoard(){
         for (int r = 0; r < board.length; r++){
             StringBuilder row = new StringBuilder();
+            row.append(r);
             for (int c = 0; c < board[0].length; c++){
                 switch(board[r][c]){
-                    case 0: row.append("_ "); break;
-                    case 1: row.append("B "); break;
-                    case 2: row.append("W "); break;
+                    case 0: row.append(" _"); break;
+                    case 1: row.append(" B"); break;
+                    case 2: row.append(" W"); break;
                 }
 
             }
-            row.append(r);
             System.out.println(row.toString());
         }
-        System.out.println("0 1 2 3 4 5 6 7");
+        System.out.println("  0 1 2 3 4 5 6 7");
     }
 }

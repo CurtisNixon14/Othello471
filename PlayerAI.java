@@ -177,7 +177,7 @@ public class PlayerAI {
                     Board new_board3 = updateBoard(new_board2, move3);
                     new_board3.score(MAX);
                     // Pruning
-                    if (new_board3.getScore() < best_max){
+                    if (new_board3.getScore() > best_min2){
                         break;
                     }
                     // Check if any of these moves offered a higher MAX than the current best MAX.

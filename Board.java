@@ -63,12 +63,15 @@ public class Board {
             StringBuilder row = new StringBuilder();
             for (int c = 0; c < board[0].length; c++){
                 switch(board[r][c]){
-                    case 0: row.append('_'); break;
-                    case 1: row.append('B'); break;
-                    case 2: row.append('W'); break;
+                    case 0: row.append("_ "); break;
+                    case 1: row.append("B "); break;
+                    case 2: row.append("W "); break;
                 }
+
             }
+            row.append(r);
             System.out.println(row.toString());
         }
+        System.out.println("0 1 2 3 4 5 6 7");
     }
 }

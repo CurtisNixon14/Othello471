@@ -158,43 +158,47 @@ public class PlayerAI {
     private int[] getBestMove(Board current_board, ArrayList<int[]> legalmoves){
         int[] bestMove = legalmoves.get(0);
         int best_max = -1;  // One below the lowest possible value for MAX.
-        int best_min = (current_board.dimen()[0] * current_board.dimen()[1]) + 1;  // One above the highest possible value for MAX.
         int MAX = 1;  // Score will be determined by number of black discs on the board.
 
-        // Checking MIN level nodes.
+        // Checking MIN level nodes. Want to get the highest possible MAX here.
         for (int[] move1 : legalmoves){
             Board new_board = updateBoard(current_board, move1);
-
             ArrayList<int[]> legalmoves2 = getLegalMoves(new_board);
 
-            // Checking MAX level nodes.
+            int best_min2 = 65; // One above the highest possible value for MAX.
+
+            // Checking MAX level nodes. Want to get the lowest possible MAX here.
             for (int[] move2 : legalmoves2){
                 Board new_board2 = updateBoard(new_board, move2);
-
                 ArrayList<int[]> legalmoves3 = getLegalMoves(new_board2);
 
-                // Checking MIN level nodes.
+                int best_max3 = -1;
+
+                // Checking MIN level nodes. Want to get the highest possible MAX here.
                 for (int[] move3 : legalmoves3){
                     Board new_board3 = updateBoard(new_board2, move3);
                     new_board3.score(MAX);
-                    if (new_board3.getScore() > best_max){
-                        best_max = new_board3.getScore();
-                        bestMove = move1;
+                    // Pruning
+                    if (new_board3.getScore() < best_max){
+                        break;
                     }
-
+                    // Check if any of these moves offered a higher MAX than the current best MAX.
+                    if (new_board3.getScore() > best_max3){
+                        best_max3 = new_board3.getScore();
+                    }
                 }
-
-                new_board2.score(MAX);
-                if (new_board2.getScore() < best_min){
-                    best_min = new_board2.getScore();
-                    bestMove = move1;
+                // Check if any moves by MIN offered a lower MAX than the current best MIN.
+                if (best_max3 < best_min2){
+                    best_min2 = best_max3;
                 }
             }
-            new_board.score(MAX);
-            if (new_board.getScore() > best_max){
-                best_max = new_board.getScore();
+
+            // Check if any moves by MAX offered a higher MAX than the current best MAX.
+            if (best_min2 > best_max){
+                best_max = best_min2;
                 bestMove = move1;
             }
+
         }
 
 

@@ -55,7 +55,7 @@ class Game{
 		if(legal){
 			legalMove(posX, posY, value, true);
 			changeSquare(posX, posY, value);
-			System.out.println("X: " + posX + " Y: " + posY);
+			System.out.println("X: " + posY + " Y: " + posX);
 		}
 	}
 	//Returns true if the proposed move is legal 
@@ -106,62 +106,7 @@ class Game{
 		}
 		return legal;
 	}
-		//returns a String of the state of the adjacent squares of the parameter
-	//String Format(8 digits, one for each direction in clockwise direction -> Up,Upright, right, downright, down, downleft, left, upleft
-	//String Inputs -> E= Empty, B = Black, W= White, C = Corner/Edge
-	public String checkAdSquares(int x, int y){
-		String state = "";
-		//up coordinate
-		if(x == 0){
-			state += "C";
-		}else{
-			state+= returnValue(x-1, y);
-		}
-		//up right coordinate
-		if(x == 0 || y == 7){
-			state += "C";
-		}else{
-			state += returnValue(x-1, y+1);
-		}
-		//right coordinate
-		if(y==7){
-			state += "C";
-		}else{
-			state += returnValue(x, y+1);
-		}
-		//right down coordinate
-		if(y==7 || x==7){
-			state += "C";
-		}else{
-			state += returnValue(x+1, y+1);
-		}
-		//down coordinate
-		if(x==7){
-			state += "C";
-		}else{
-			state += returnValue(x+1, y);
-		}
-		//down left coordinate
-		if(x==7 || y==0){
-			state += "C";
-		}else{
-			state += returnValue(x+1, y-1);
-		}
-		//left coordinate
-		if(y==0){
-			state += "C";
-		}else{
-			state += returnValue(x, y-1);
-		}
-		//left up coordinate
-		if(x==0 || y==0){
-			state += "C";
-		}else{
-			state += returnValue(x-1, y-1);
-		}
-		return state;
-	}
-	private String printRow(int x){
+private String printRow(int x){
 		String row = "";
 		for(int i = 1; i < 9; i++){
 			switch(returnValue(x,i)){
@@ -214,7 +159,7 @@ class Game{
 				p = getInputFromUser();
 				x = p.getX();
 				y = p.getY();
-				if(legalMove(x, y, 1, false)){
+				if(legalMove(y,x , 1, false)){
 					makeMove(x,y , 1);
 					turn = false;
 				}else{
@@ -226,7 +171,7 @@ class Game{
 				p = getInputFromUser();
 				x = p.getX();
 				y = p.getY();
-				if(legalMove(x, y, 2, false)){
+				if(legalMove(y,x, 2, false)){
 					makeMove(x,y, 2);
 					turn = true;
 				}else{
@@ -234,6 +179,10 @@ class Game{
 				}
 			}else{
 				System.out.println("No more legal moves");
+				if(legalMovesBlack.isEmpty() && legalMovesWhite.isEmpty()){
+					movesLeft = false;
+				}
+				
 			}
 			printGameState();
 		}
@@ -272,7 +221,7 @@ class Game{
 			} catch (Exception e) {
 				System.out.println(invalid);
 			}
-			if(x < 9 && x > 1){
+			if(x < 9 && x > 0){
 				validInput = true;
 			}
 		}
@@ -284,7 +233,7 @@ class Game{
 			} catch (Exception e) {
 				System.out.println(invalid);
 			}
-			if(y < 9 && y > 1){
+			if(y < 9 && y > 0){
 				validInput = true;
 			}
 		}
@@ -295,7 +244,7 @@ class Game{
 		Point p;
 		for(int i = 1; i<9;i++){
 			for(int j = 1; j<9;j++){
-				if(legalMove(i, j, color, false)){
+				if(legalMove(i,j, color, false)){
 					p = new Point(j,i);
 					list.add(p);
 				}

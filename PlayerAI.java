@@ -158,21 +158,19 @@ public class PlayerAI {
     private int[] getBestMove(Board current_board, ArrayList<int[]> legalmoves){
         int[] bestMove = legalmoves.get(0);
         int best_max = -1;  // One below the lowest possible value for MAX.
-        int MAX = 1;  // Score will be determined by number of black discs on the board.
+        int MAX = turn;  // Score will be determined by number of white discs on the board, AI goes second by default.
 
         // Checking MIN level nodes. Want to get the highest possible MAX here.
         for (int[] move1 : legalmoves){
             Board new_board = updateBoard(current_board, move1);
             ArrayList<int[]> legalmoves2 = getLegalMoves(new_board);
-
             int best_min2 = 65; // One above the highest possible value for MAX.
 
             // Checking MAX level nodes. Want to get the lowest possible MAX here.
             for (int[] move2 : legalmoves2){
                 Board new_board2 = updateBoard(new_board, move2);
                 ArrayList<int[]> legalmoves3 = getLegalMoves(new_board2);
-
-                int best_max3 = -1;
+                int best_max3 = -1; // One below the lowest possible value for MAX.
 
                 // Checking MIN level nodes. Want to get the highest possible MAX here.
                 for (int[] move3 : legalmoves3){
@@ -200,10 +198,6 @@ public class PlayerAI {
             }
 
         }
-
-
-
-
 
         return bestMove;
     }

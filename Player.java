@@ -23,7 +23,7 @@ public class Player {
             throw new Exception();  // If no legal moves are available, throws an Exception to warn Othello471.Game.
         }
 
-        System.out.print("\nLegal moves available: ");
+        System.out.print("Legal moves available: ");
         for (String m : legalMoves){
             System.out.print("[" + m.charAt(m.length()-2) + "," + m.charAt(m.length()-1) + "] ");
         }
@@ -39,7 +39,7 @@ public class Player {
             for (String m : legalMoves){
                 if (Character.getNumericValue(m.charAt(m.length()-2)) == move[0]
                         && Character.getNumericValue(m.charAt(m.length()-1)) == move[1]){
-                    return updateBoard(currentState, m);
+                    return updateBoard(currentState, m, legalMoves);
                 }
             }
         }
@@ -54,19 +54,27 @@ public class Player {
         // Getting the best move.
         String bestMove = getBestMove(currentState, legalMoves);
         // Making a move.
-        return updateBoard(currentState, bestMove);
+        return updateBoard(currentState, bestMove, legalMoves);
     }
 
     // Places a disc onto the board and flips any captured discs.
-    private Board updateBoard(Board prevState, String thisMove){
+    private Board updateBoard(Board prevState, String move_string, ArrayList<String> legalMoves){
         Board currentState = new Board(prevState);
         int row;
         int column;
+        String position = move_string.substring(move_string.length()-2);
 
-        for (int i = 0; i < thisMove.length(); i+=2){
-            row = Character.getNumericValue(thisMove.charAt(i));
-            column = Character.getNumericValue(thisMove.charAt(i+1));
-            currentState.mark(turn, row, column);
+        for (String thisMove : legalMoves){
+            // Find any move-strings with the same endpoint as specified in String position.
+            if (position.charAt(0) == thisMove.charAt(thisMove.length()-2)
+                && position.charAt(1) == thisMove.charAt(thisMove.length()-1)) {
+                // If any such move-strings exist, execute them.
+                for (int i = 0; i < thisMove.length(); i+=2){
+                    row = Character.getNumericValue(thisMove.charAt(i));
+                    column = Character.getNumericValue(thisMove.charAt(i+1));
+                    currentState.mark(turn, row, column);
+                }
+            }
         }
 
         return currentState;
@@ -122,8 +130,6 @@ public class Player {
             }
         }
 
-        
-
         return list_legalmoves;
     }
 
@@ -134,19 +140,19 @@ public class Player {
 
         // Checking MIN level nodes. Want to get the highest possible MAX here.
         for (String move1 : legalmoves){
-            Board new_board = updateBoard(current_board, move1);
+            Board new_board = updateBoard(current_board, move1, legalmoves);
             ArrayList<String> legalmoves2 = getLegalMoves(new_board);
             int best_min2 = 65; // One above the highest possible value for MAX.
 
             // Checking MAX level nodes. Want to get the lowest possible MAX here.
             for (String move2 : legalmoves2){
-                Board new_board2 = updateBoard(new_board, move2);
+                Board new_board2 = updateBoard(new_board, move2, legalmoves2);
                 ArrayList<String> legalmoves3 = getLegalMoves(new_board2);
                 int best_max3 = -1; // One below the lowest possible value for MAX.
 
                 // Checking MIN level nodes. Want to get the highest possible MAX here.
                 for (String move3 : legalmoves3){
-                    Board new_board3 = updateBoard(new_board2, move3);
+                    Board new_board3 = updateBoard(new_board2, move3, legalmoves3);
                     new_board3.score(MAX);
                     // Pruning
                     if (new_board3.getScore() > best_min2){

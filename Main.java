@@ -1,5 +1,4 @@
 package Othello471;
-import java.lang.Character;
 
 public class Main {
 
@@ -24,11 +23,11 @@ public class Main {
             board.printBoard();
             try{
                 if (turncount % 2 == 1){
-                    System.out.println("Player 1's turn.");
+                    System.out.println("\nPlayer 1's turn.");
                     board = player.makeMove(board);
                 }
                 else{
-                    System.out.println("Player 2's turn.");
+                    System.out.println("\nPlayer 2's turn.");
                     board = opponent.makeMove(board);
                 }
 

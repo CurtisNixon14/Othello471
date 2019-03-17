@@ -53,6 +53,8 @@ public class Player {
         }
         // Getting the best move.
         String bestMove = getBestMove(currentState, legalMoves);
+        System.out.println("AI: [" + bestMove.charAt(bestMove.length()-2) + ","
+                + bestMove.charAt(bestMove.length()-1) + "] ");
         // Making a move.
         return updateBoard(currentState, bestMove, legalMoves);
     }

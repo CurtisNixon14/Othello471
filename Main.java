@@ -23,11 +23,11 @@ public class Main {
             board.printBoard();
             try{
                 if (turncount % 2 == 1){
-                    System.out.println("\nPlayer2 1's turn.");
+                    System.out.println("\nPlayer 1's turn.");
                     board = player.makeMove(board);
                 }
                 else{
-                    System.out.println("\nPlayer2 2's turn.");
+                    System.out.println("\nPlayer 2's turn.");
                     board = opponent.nextMove(board);
                 }
 
@@ -36,23 +36,25 @@ public class Main {
             catch (Exception no_moves){
                 turns_with_no_moves++;  // Game ends if player and opponent both cannot move.
                 if (turncount % 2 == 1){
-                    System.out.println("Player2 1 cannot move.");
+                    System.out.println("Player 1 cannot move.");
                 }
                 else{
-                    System.out.println("Player2 2 cannot move.");
+                    System.out.println("Player 2 cannot move.");
                 }
 
             }
         }
 
-        System.out.print("Game is over. Winner: ");
+        System.out.println("\nGame is over.");
         int p1score = board.score(p1);
         int p2score = board.score(p2);
+        System.out.println("Player 1 scored: " + p1score);
+        System.out.println("Player 2 scored: " + p2score);
         if (p1score > p2score){
-            System.out.println("Player2 1");
+            System.out.println("Player 1 wins.");
         }
         else{
-            System.out.println("Player2 2");
+            System.out.println("Player 2 wins.");
         }
     }
 }

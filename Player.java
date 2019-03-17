@@ -135,6 +135,7 @@ public class Player {
         return list_legalmoves;
     }
 
+    // Conducts 3-ply alpha-beta pruning to get the next best move.
     private String getBestMove(Board current_board, ArrayList<String> legalmoves){
         String bestMove = legalmoves.get(0);
         int best_max = -1;  // One below the lowest possible value for MAX.

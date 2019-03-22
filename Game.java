@@ -1,4 +1,4 @@
-
+package myothello;
 
 import java.awt.dnd.*;
 import javax.naming.directory.*;
@@ -33,9 +33,35 @@ class Game{
 			return false;
 		}
 	}
+        public int getScore(){
+            int score = 0;
+            for(int i = 0; i < 10; i++){
+                for(int j = 0; j < 10; j++){
+                    if(game_board[i][j]==1){
+                        score--;
+                    }
+                    if(game_board[i][j]==2){
+                        score++;
+                    }
+                }
+            }
+            return score;
+        }
 	//return values: -1 border, 0 empty, 1 black, 2 white
 	public int[][] getGameState(){
 		return game_board;
+	}
+        public void setGameState(int[][]g){
+            game_board = g;
+        }
+        public int[][] copyGameState(){
+		int [][] nb = new int[10][10];
+		for(int i = 0; i < 10; i++){
+			for(int j = 0; j < 10; j++){
+				nb[i][j] = game_board[i][j];
+			}
+		}
+		return nb;
 	}
 	public void changeSquare(int x, int y ,int value){
 		game_board[x][y] = value;
@@ -55,7 +81,6 @@ class Game{
 		if(legal){
 			legalMove(posX, posY, value, true);
 			changeSquare(posX, posY, value);
-			System.out.println("X: " + posY + " Y: " + posX);
 		}
 	}
 	//Returns true if the proposed move is legal 
@@ -106,7 +131,7 @@ class Game{
 		}
 		return legal;
 	}
-private String printRow(int x){
+        private String printRow(int x){
 		String row = "";
 		for(int i = 1; i < 9; i++){
 			switch(returnValue(x,i)){
@@ -129,6 +154,10 @@ private String printRow(int x){
 			System.out.println((i) + " [ "+ printRow(i) + "]");	
 		}
 	}
+        public void newGame(){
+            game_board = new int[10][10];
+            setupGame();
+        }
 	private void setupGame(){
 		for(int i = 0; i < 10;i++){
 			changeSquare(0, i, -1);
@@ -188,7 +217,22 @@ private String printRow(int x){
 		}
 		endGame();
 	}
-	private void endGame(){
+        public void showScore(){
+            int black = 0;
+            int white = 0;
+            for (int i = 1; i < 10 ; i++){
+                for(int j = 0; j < 10; j++){
+                    if(game_board[i][j] == 1){
+                        black++;
+                    }
+                    if(game_board[i][j] == 2){
+                        white++;
+                    }
+                }   
+            }
+            System.out.println("Black: " + black + " White: " + white);
+        }
+	public void endGame(){
 		int black = 0;
 		int white = 0;
 		for(int i = 1; i <9; i ++){
@@ -201,11 +245,11 @@ private String printRow(int x){
 			}
 		}
 		if(black > white){
-			System.out.print("Game over: Black wins");
+			System.out.println("Game over: Black wins");
 		}else if(white > black){
-			System.out.print("Game over: White wins");
+			System.out.println("Game over: White wins");
 		}else{
-			System.out.print("No winner: DeadLock");
+			System.out.println("No winner: DeadLock");
 		}
 	}
 	public Point getInputFromUser(){
@@ -251,21 +295,6 @@ private String printRow(int x){
 			}
 		}
 		return list;
-	}
-
-		public static void main(String [] args){
-			Game sim_game = new Game();
-			sim_game.printGameState();
-			sim_game.simGame();
-			/**
-			List <Point> list = sim_game.getMoves(1);
-			Point p;
-			while(!list.isEmpty()){
-				p = list.remove(list.size()-1);
-				System.out.println(p);
-			}
-			*/
-	
 	}
 }
 class Point{

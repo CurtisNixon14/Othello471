@@ -1,0 +1,231 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package myothello;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+/**
+ *
+ * @author Curtismacpro
+ * This class will act like the AI player for the game Othello and also run the game 
+ */
+public class MyOthello {
+
+    
+    static int MAX = 1000;
+    static int MIN = -1000;
+    
+    
+    /**
+     * @param args the command line arguments
+     */
+    Game game;
+    //Parameter is which AI to use for the game
+    public MyOthello(){
+        game = new Game();
+    }
+    public void newGame(){
+        game.newGame();
+    }
+    
+    public void runStupidAIvsAI(){
+        boolean turn = true;
+        int x;
+        int y;
+        Point p;
+        List<Point> legalMovesBlack;
+        List<Point> legalMovesWhite;
+        boolean movesLeft = true;
+        while(movesLeft){
+            //black player
+            legalMovesBlack = game.getMoves(1);
+            if(!legalMovesBlack.isEmpty()){
+                p = legalMovesBlack.remove(legalMovesBlack.size()-1);
+                game.makeMove(p.getX(), p.getY(), 1);
+            }
+            //white player
+            legalMovesWhite = game.getMoves(2);
+            if(!legalMovesWhite.isEmpty()){
+                p = legalMovesWhite.remove(legalMovesWhite.size()-1);
+                game.makeMove(p.getX(), p.getY(), 2);
+            }
+            if(legalMovesWhite.isEmpty() && legalMovesBlack.isEmpty()){
+                game.printGameState();
+                game.endGame();
+                game.showScore();
+                movesLeft = false;
+            }
+            legalMovesBlack.clear();
+            legalMovesWhite.clear();
+        }        
+    }
+    public void runHvsAI(){
+        boolean turn = true;
+        int x;
+        int y;
+        Point p;
+        List<Point> legalMoves;
+        List<Point> computerMoves;
+        boolean movesLeft = true;
+        while(movesLeft){
+            legalMoves = game.getMoves(1);
+            computerMoves = game.getMoves(2);
+            game.printGameState();
+            game.showScore();
+            if(turn && !legalMoves.isEmpty()){
+                System.out.println(legalMoves);
+                System.out.println("Black Move");
+                p = game.getInputFromUser();
+                x = p.getX();
+                y = p.getY();
+                if(game.legalMove(y,x,1,false)){
+                    game.makeMove(x,y,1);
+                    turn = false;
+                }else{
+                    System.out.println("Invalid move, Try Again");
+                }
+            }else if(!turn && !computerMoves.isEmpty()){
+                System.out.println("Computers turn");
+                int [][] g = game.copyGameState();
+                //p = bestCurrentMove(game.getGameState(),computerMoves,2);
+                System.out.println(bestCurrentMove(game.getGameState(),computerMoves,2));
+                p = bestSmartMove(game.getGameState(),computerMoves);
+                game.setGameState(g);
+                if(game.legalMove(p.getY(),p.getX(),2,false)){
+                    game.makeMove(p.getX(),p.getY(),2);
+                    System.out.println(p);
+                    turn = true;
+                }else{
+                    System.out.println("The Computer made an invalid move");
+                    System.out.println(p);
+                    game.printGameState();
+                }      
+            }
+            if(legalMoves.isEmpty()){
+                turn = false;
+            }else if(computerMoves.isEmpty()){
+                System.out.println("No more moves for the dumb computer");
+                turn = true;
+            }
+            if(legalMoves.isEmpty() && computerMoves.isEmpty()){
+                System.out.println("No more legal moves");
+                movesLeft = false;
+            }
+            legalMoves.clear();
+            computerMoves.clear();
+        }
+        game.printGameState();
+        game.endGame();
+    }
+    public Point minimax(int board[][],List<Point> moves){
+        Point bestMove = moves.get(0);
+        int best_max = -1;
+        //int MAX = turn; //AI will always be white.(second turn)
+        Game game = new Game(board);
+        
+        for(Point move1 : moves){
+            game.makeMove(move1.getX(),move1.getY(),2);
+            int newBoard[][] = game.getGameState();
+        }
+        
+        return new Point();
+        
+    }
+    
+    public Point bestCurrentMove(int [][] board, List<Point> moves, int turn){
+        Point bestMove = moves.get(0); 
+        int bestScore = 0;
+        Game testGame = new Game(board);
+        int [][]current_board = testGame.copyGameState();
+        
+        for(Point cMove : moves){
+            testGame.setGameState(current_board);
+            if(turn == 1){
+                testGame.makeMove(cMove.getX(),cMove.getY(), turn);
+                if(testGame.getScore()< bestScore){
+                    bestMove = cMove;
+                    bestScore = testGame.getScore();
+                }
+            }else{
+                testGame.makeMove(cMove.getX(), cMove.getY(), turn);
+                if(testGame.getScore()>bestScore){
+                    bestMove = cMove;
+                    bestScore = testGame.getScore();
+                }
+            }
+        }
+        System.out.println(bestMove);
+        return bestMove;
+    }
+    public Point bestSmartMove(int [][]board, List<Point> moves){
+        Point bestMove = moves.get(0);
+        int max = -65;
+        for(Point move : moves){
+            //simulated moves using computers moves
+            int [][]c_board = game.copyGameState();
+            Game testGame = new Game(c_board);
+            testGame.makeMove(move.getX(),move.getY(), 2);
+            //get moves for the Human player to sim next move
+            List<Point> bMoves = testGame.getMoves(1);
+            int best_min = 65;
+            
+            //vheck each human player move
+            for(Point move1 : bMoves){
+                Game testGame1 = new Game();
+                testGame1.setGameState(testGame.copyGameState());
+                testGame1.makeMove(move1.getX(), move1.getY(), 1);
+                //get moves for the comp player it sim next move
+                List<Point> wMoves = testGame1.getMoves(2);
+                int best_max = -65;
+                
+                //check all comp moves
+                for(Point move2 : wMoves){
+                    Game testGame2 = new Game();
+                    testGame2.setGameState(testGame1.copyGameState());
+                    testGame2.makeMove(move2.getX(), move2.getY(), 2);
+                    //get score of the board 
+                    int score = testGame2.getScore();
+                    //prune
+                    if(score > max){
+                        break;
+                    }
+                    if(score > best_max){
+                        best_max = score;
+                    }
+                }
+                if(best_max < best_min){
+                    best_min = best_max;
+                }
+            }
+            if(best_min > max){
+                max = best_min;
+                bestMove = move;
+            }
+            
+        }
+        return bestMove;
+    }
+    
+    	public static void main(String [] args){
+                        /**
+			Game sim_game = new Game();
+			sim_game.printGameState();
+			sim_game.simGame();
+                        **/
+                        MyOthello o = new MyOthello();
+                        for(int i = 0; i < 5; i++){
+                            o.runStupidAIvsAI();
+                        }
+                        o.newGame();
+                        
+                        o.runHvsAI();
+                        
+	
+	}
+    
+}

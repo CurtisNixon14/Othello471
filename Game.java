@@ -169,54 +169,7 @@ class Game{
 		changeSquare(5, 4, 1);
 		changeSquare(4, 4, 2);
 		changeSquare(5, 5, 2);
-	}
-	public void simGame(){
-		boolean turn = true;
-		int x;
-		int y;
-		Point p;
-		List<Point> legalMovesBlack;
-		List<Point> legalMovesWhite;
-		String invalid = "Invalid Move, please try again";
-		boolean movesLeft = true;
-		while(movesLeft){
-			legalMovesBlack = getMoves(1);
-			legalMovesWhite = getMoves(2);
-			if(turn && !legalMovesBlack.isEmpty()){
-				System.out.println(legalMovesBlack);
-				System.out.println("Black Move");
-				p = getInputFromUser();
-				x = p.getX();
-				y = p.getY();
-				if(legalMove(y,x , 1, false)){
-					makeMove(x,y , 1);
-					turn = false;
-				}else{
-					System.out.print(invalid+"\n");
-				}
-			}else if(!turn && !legalMovesWhite.isEmpty()){
-				System.out.print(legalMovesWhite);
-				System.out.println("White Move");
-				p = getInputFromUser();
-				x = p.getX();
-				y = p.getY();
-				if(legalMove(y,x, 2, false)){
-					makeMove(x,y, 2);
-					turn = true;
-				}else{
-					System.out.println(invalid+"\n");
-				}
-			}else{
-				System.out.println("No more legal moves");
-				if(legalMovesBlack.isEmpty() && legalMovesWhite.isEmpty()){
-					movesLeft = false;
-				}
-				
-			}
-			printGameState();
-		}
-		endGame();
-	}
+        }
         public void showScore(){
             int black = 0;
             int white = 0;

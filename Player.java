@@ -158,13 +158,17 @@ public class Player {
                     Board new_board3 = updateBoard(new_board2, move3, legalmoves3);
                     new_board3.score(MAX);
                     // Pruning
-                    if (new_board3.getScore() > best_max){
+                    if (new_board3.getScore() > best_min2){
                         break;
                     }
                     // Check if any of these moves offered a higher MAX than the current best MAX.
                     if (new_board3.getScore() > best_max3){
                         best_max3 = new_board3.getScore();
                     }
+                }
+                // Pruning
+                if (best_min2 < best_max){
+                    break;
                 }
                 // Check if any moves by MIN offered a lower MAX than the current best MIN.
                 if (best_max3 < best_min2){

@@ -4,6 +4,8 @@ public class Main {
 
     public static void main(String[] args){
 
+        Board b = new Board();
+
         runGame();
     }
 
@@ -53,8 +55,11 @@ public class Main {
         if (p1score > p2score){
             System.out.println("Player 1 wins.");
         }
-        else{
+        else if (p2score > p1score){
             System.out.println("Player 2 wins.");
+        }
+        else{
+            System.out.println("Stalemate.");
         }
     }
 

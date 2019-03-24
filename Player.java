@@ -1,5 +1,3 @@
-package Othello471;
-
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.lang.Character;

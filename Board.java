@@ -1,4 +1,3 @@
-package Othello471;
 import java.util.ArrayList;
 
 public class Board {
